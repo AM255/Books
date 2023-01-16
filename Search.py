@@ -49,3 +49,88 @@ class BookSearchGUI:
 		self.root.bind('<Return>', lambda event: self.search_button.invoke())
 
 		self.title_entry.focus_set()
+	def search(self):
+		# Get the book title and author from the entry fields
+		book_title = self.title_entry.get()
+		book_author = self.author_entry.get()
+		book_rating = self.rating_entry.get()
+
+		# Make a request to the Open Library API to search for the book by its title and author
+		response = requests.get(
+		 f'https://openlibrary.org/search.json?title={book_title}&author={book_author}'
+		)
+
+		# Convert the response from JSON to a Python dictionary
+		results = response.json()
+
+		# Extract the first result from the results
+		book = results['docs'][0]
+
+		# Store the book information in a dictionary
+		self.book_data = {
+		 'Title':
+		 book['title'],
+		 'Author':
+		 book['author_name'][0],
+		 'Language':
+		 book['language'][0] if 'language' in book else None,
+		 'Date':
+		 self.date_entered,
+		 'Rating':
+		 book_rating,
+		 'Publish year':
+		 book['publish_year'][-1] if 'publish_year' in book else None,
+		 'Number pages':
+		 book['number_of_pages_median']
+		 if 'number_of_pages_median' in book else None,
+		 'Key':
+		 book['key'] if 'key' in book else None
+		}
+
+		# Open a new window to edit the data
+		self.edit_window = tk.Toplevel(self.root)
+		self.edit_window.title("Edit")
+
+		# Create labels and entry widgets for each column
+		tk.Label(self.edit_window, text="Title:").grid(row=0, column=0, sticky=tk.W)
+		tk.Label(self.edit_window, text="Author:").grid(row=1, column=0, sticky=tk.W)
+		tk.Label(self.edit_window, text="Language:").grid(row=2,column=0,sticky=tk.W)
+		tk.Label(self.edit_window, text="Date:").grid(row=3, column=0, sticky=tk.W)
+		tk.Label(self.edit_window, text="Rating:").grid(row=4, column=0, sticky=tk.W)
+		tk.Label(self.edit_window, text="Publish Year:").grid(row=5,column=0,sticky=tk.W)
+		tk.Label(self.edit_window, text="Number Pages:").grid(row=6,column=0,sticky=tk.W)
+		tk.Label(self.edit_window, text="Key:").grid(row=7, column=0, sticky=tk.W)
+		self.title_entry = tk.Entry(self.edit_window)
+		self.author_entry = tk.Entry(self.edit_window)
+		self.language_entry = tk.Entry(self.edit_window)
+		self.date_entry = tk.Entry(self.edit_window)
+		self.rating_entry = tk.Entry(self.edit_window)
+		self.publish_year_entry = tk.Entry(self.edit_window)
+		self.number_pages_entry = tk.Entry(self.edit_window)
+		self.key_entry = tk.Entry(self.edit_window)
+		self.title_entry.grid(row=0, column=1, padx=5, pady=5)
+		self.author_entry.grid(row=1, column=1, padx=5, pady=5)
+		self.language_entry.grid(row=2, column=1, padx=5, pady=5)
+		self.date_entry.grid(row=3, column=1, padx=5, pady=5)
+		self.rating_entry.grid(row=4, column=1, padx=5, pady=5)
+		self.publish_year_entry.grid(row=5, column=1, padx=5, pady=5)
+		self.number_pages_entry.grid(row=6, column=1, padx=5, pady=5)
+		self.key_entry.grid(row=7, column=1, padx=5, pady=5)
+
+		# Pre-populate the entry widgets with the data from the selected row
+		self.title_entry.insert(0, (self.book_data["Title"]))
+		self.author_entry.insert(0, (self.book_data["Author"]))
+		self.language_entry.insert(0, (self.book_data["Language"]))
+		self.date_entry.insert(0, (self.book_data["Date"]))
+		self.rating_entry.insert(0, (self.book_data["Rating"]))
+		self.publish_year_entry.insert(0, (self.book_data["Publish year"]))
+		self.number_pages_entry.insert(0, (self.book_data["Number pages"]))
+		self.key_entry.insert(0, (self.book_data["Key"]))
+
+		# Create a save button
+		self.add_button = tk.Button(self.edit_window, text="Add", command=self.add)
+		self.add_button.grid(row=8, column=0, padx=5, pady=5, sticky=tk.W)
+
+		# Create a cancel button
+		self.done_button = tk.Button(self.edit_window,text="Done",command=self.edit_window.destroy)
+		self.done_button.grid(row=8, column=1, padx=5, pady=5, sticky=tk.E)
