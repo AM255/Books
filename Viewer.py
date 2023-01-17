@@ -127,3 +127,41 @@ class BookViewerGUI:
 		                               text="Cancel",
 		                               command=self.edit_window.destroy)
 		self.cancel_button.grid(row=7, column=1, padx=5, pady=5, sticky=tk.E)
+	
+	def save_edit(self):
+		# Get the data from the entry widgets
+		new_values = [
+		 self.title_entry.get(),
+		 self.author_entry.get(),
+		 self.language_entry.get(),
+		 self.date_entry.get(),
+		 self.rating_entry.get(),
+		 self.publish_year_entry.get(),
+		 self.number_pages_entry.get(),
+		]
+
+		# Update the data in the treeview widget
+		self.table.item(self.item, values=tuple(new_values))
+
+		# Write the updated data back to the CSV file
+		with open(self.file_path, "w", newline='') as csv_file:
+			csv_writer = csv.DictWriter(csv_file,
+			                            fieldnames=[
+			                             "title", "author", "language", "date",
+			                             "rating", "publish_year", "number_pages", "key"
+			                            ])
+			csv_writer.writeheader()
+			for row in self.table.get_children():
+				values = self.table.item(row)["values"]
+				csv_writer.writerow({
+				 "title": values[0],
+				 "author": values[1],
+				 "language": values[2],
+				 "date": values[3],
+				 "rating": values[4],
+				 "first_publish_year": values[5],
+				 "number_pages": values[6],
+				})
+
+		# Close the edit window
+		self.edit_window.destroy()
