@@ -134,3 +134,49 @@ class BookSearchGUI:
 		# Create a cancel button
 		self.done_button = tk.Button(self.edit_window,text="Done",command=self.edit_window.destroy)
 		self.done_button.grid(row=8, column=1, padx=5, pady=5, sticky=tk.E)
+	def add(self):
+		# Get the data from the entry widgets
+		book_data = {
+		 'Title': self.title_entry.get(),
+		 'Author': self.author_entry.get(),
+		 'Language': self.language_entry.get(),
+		 'Date': self.date_entry.get(),
+		 'Rating': self.rating_entry.get(),
+		 'Publish year': self.publish_year_entry.get(),
+		 'Number pages': self.number_pages_entry.get(),
+		 'Key': self.key_entry.get()
+		}
+
+		# Add the book data to the book history lists
+		self.book_history.append(book_data)
+		self.book_history_json.append(book_data)
+
+		file_path = 'book_history.csv'
+		# Check if the file exists
+		if not os.path.exists(file_path):
+			# The file does not exist, so write the header row
+			with open(file_path, 'w', newline='') as csvfile:
+				fieldnames = [
+				 'Title', 'Author', 'Language', 'Date', 'Rating', 'Publish year',
+				 'Number pages', 'Key'
+				]
+				writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+				writer.writeheader()
+				for book in self.book_history:
+					writer.writerow(book)
+		else:
+			# The file already exists, so write the data to the file
+			with open(file_path, 'a', newline='') as csvfile:
+				fieldnames = [
+				 'Title', 'Author', 'Language', 'Date', 'Rating', 'Publish year',
+				 'Number pages', 'Key'
+				]
+				writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+				for book in self.book_history:
+					writer.writerow(book)
+
+		# Close the edit window
+		self.edit_window.destroy()
+
+		# Close the main window
+		self.root.destroy()
