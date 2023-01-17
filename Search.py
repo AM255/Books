@@ -180,3 +180,12 @@ class BookSearchGUI:
 
 		# Close the main window
 		self.root.destroy()
+if __name__ == "__main__":
+	# Create a root window
+	root = tk.Tk()
+
+	# Create an instance of the BookViewerGUI class
+	app = BookViewerGUI(root)
+
+	# Run the main loop
+	root.mainloop()
